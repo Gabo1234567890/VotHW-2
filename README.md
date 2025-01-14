@@ -53,8 +53,8 @@ docker-compose up --build
 
 ```bash
 
-curl -X POST http://localhost:5000/upload \
--H "Authorization: Bearer <JWT_TOKEN>" \
+curl -X POST http://localhost:5000/upload
+-H "Authorization: Bearer <JWT_TOKEN>"
 -F "file=@example.txt"
 
 ```
@@ -63,7 +63,7 @@ curl -X POST http://localhost:5000/upload \
 
 ```bash
 
-curl -X GET http://localhost:5000/download/<file_id> \
+curl -X GET http://localhost:5000/download/<file_id>
 -H "Authorization: Bearer <JWT_TOKEN>"
 
 ```
@@ -72,8 +72,8 @@ curl -X GET http://localhost:5000/download/<file_id> \
 
 ```bash
 
-curl -X PUT http://localhost:5000/update/<file_id> \
--H "Authorization: Bearer <JWT_TOKEN>" \
+curl -X PUT http://localhost:5000/update/<file_id>
+-H "Authorization: Bearer <JWT_TOKEN>"
 -F "file=@new_example.txt"
 
 ```
@@ -82,7 +82,7 @@ curl -X PUT http://localhost:5000/update/<file_id> \
 
 ```bash
 
-curl -X DELETE http://localhost:5000/delete/<file_id> \
+curl -X DELETE http://localhost:5000/delete/<file_id>
 -H "Authorization: Bearer <JWT_TOKEN>"
 
 ```
