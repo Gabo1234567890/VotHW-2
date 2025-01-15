@@ -1,7 +1,4 @@
 from flask import Flask, request, jsonify
-import jwt.exceptions
-import jwt.jws
-import jwt.utils
 from minio import Minio
 from minio.error import S3Error
 import jwt
