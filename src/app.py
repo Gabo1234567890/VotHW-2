@@ -13,7 +13,7 @@ app = Flask(__name__)
 # MinIO Configuration
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "localhost:9000")
 MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "admin")
-MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "password123")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "admin123")
 MINIO_BUCKET = os.getenv("MINIO_BUCKET", "files")
 
 # Keycloak Configuration

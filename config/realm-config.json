@@ -1,0 +1,41 @@
+{
+  "realm": "VotHw",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "vothw-api-client",
+      "enabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "secret": "8OvBlk8VApHTwvFIvU3ZVr4WPKRCs2wA",
+      "rootUrl": "http://localhost:5000",
+      "redirectUris": ["http://localhost:5000/*"]
+    }
+  ],
+  "roles": {
+    "client": {
+      "vothw-api-client": [
+        {
+          "name": "user"
+        }
+      ]
+    }
+  },
+  "users": [
+    {
+      "username": "JohnDoe",
+      "enabled": true,
+      "email": "johndoe@example.com",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "0000"
+        }
+      ],
+      "clientRoles": {
+        "vothw-api-client": ["user"]
+      }
+    }
+  ]
+}

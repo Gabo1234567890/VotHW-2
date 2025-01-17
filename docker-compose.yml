@@ -8,7 +8,7 @@ services:
       - "40419:40419"
     environment:
       MINIO_ROOT_USER: "admin"
-      MINIO_ROOT_PASSWORD: "password123"
+      MINIO_ROOT_PASSWORD: "admin123"
     volumes:
       - ./data/minio:/data
     command: server /data --console-address ":40419"
@@ -17,12 +17,17 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
+    command: start --import-realm --db=postgres --db-url=jdbc:postgresql://postgres:5432/keycloak --db-username=admin --db-password=admin123 --http-enabled=true --hostname=localhost --verbose
     environment:
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "admin123"
-    command: start-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "8081:8080"
+    volumes:
+      - ./config/realm-config.json:/opt/keycloak/data/import/realm-config.json
     networks:
       - vothw_net
 
@@ -37,12 +42,33 @@ services:
     environment:
       MINIO_ENDPOINT: "minio:9000"
       MINIO_ACCESS_KEY: "admin"
-      MINIO_SECRET_KEY: "password123"
+      MINIO_SECRET_KEY: "admin123"
       MINIO_BUCKET: "files"
       JWT_SECRET: "your_secret_key"
     networks:
       - vothw_net
 
+  postgres:
+    image: postgres:14
+    container_name: keycloak-postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    volumes:
+      - keycloak-postgres-data:/var/lib/postgresql/data
+    networks:
+      - vothw_net
+    healthcheck:
+      test:
+        ["CMD-SHELL", "echo 'SELECT 1' | psql -U admin -d keycloak || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 networks:
   vothw_net:
     driver: bridge
+
+volumes:
+  keycloak-postgres-data:
