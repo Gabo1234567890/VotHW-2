@@ -27,6 +27,8 @@
       "enabled": true,
       "email": "johndoe@example.com",
       "emailVerified": true,
+      "firstName": "John",
+      "lastName": "Doe",
       "credentials": [
         {
           "type": "password",
@@ -34,8 +36,10 @@
         }
       ],
       "clientRoles": {
-        "vothw-api-client": ["user"]
-      }
+        "vothw-api-client": ["user"],
+        "account": ["manage-account", "manage-account-links", "view-profile"]
+      },
+      "realmRoles": ["offline_access", "default-roles-vothw"]
     }
   ]
 }

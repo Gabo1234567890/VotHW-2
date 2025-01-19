@@ -7,6 +7,7 @@ import os
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
+import base64
 
 app = Flask(__name__)
 
@@ -17,7 +18,11 @@ MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "admin123")
 MINIO_BUCKET = os.getenv("MINIO_BUCKET", "files")
 
 # Keycloak Configuration
-KEYCLOAK_URL = os.getenv("KEYCLOAK_URL", "http://localhost:8081")
+#if os.getenv("ENVIRONMENT") == "docker":
+    #KEYCLOAK_URL = "http://keycloak:8081"
+#else:
+#    KEYCLOAK_URL = "http://localhost:8081"
+KEYCLOAK_URL = "http://host.docker.internal:8081"
 REALM = os.getenv("REALM", "VotHw")
 JWKS_URL = f"{KEYCLOAK_URL}/realms/{REALM}/protocol/openid-connect/certs"
 
@@ -27,6 +32,9 @@ minio_client = Minio(MINIO_ENDPOINT, access_key=MINIO_ACCESS_KEY, secret_key=MIN
 if not minio_client.bucket_exists(MINIO_BUCKET):
     minio_client.make_bucket(MINIO_BUCKET)
 
+def b64_to_int(data):
+    return int.from_bytes(base64.urlsafe_b64decode(data + "=="), "big")
+
 # Fetch JWKS
 def get_public_key(token):
     try:
@@ -34,6 +42,8 @@ def get_public_key(token):
         jwks_response = requests.get(JWKS_URL)
         jwks_response.raise_for_status()
         jwks = jwks_response.json()["keys"]
+        print("JSWKS:")
+        print(jwks)
         
         # Decode the JWT to get the 'kid' (key ID)
         unverified_header = jwt.get_unverified_header(token)
@@ -47,8 +57,8 @@ def get_public_key(token):
             if key["kid"] == kid:
                 # Convert the key to a public RSA key
                 public_key = rsa.RSAPublicNumbers(
-                    e=int.from_bytes(bytes.fromhex(key["e"]), "big"),
-                    n=int.from_bytes(bytes.fromhex(key["n"]), "big")
+                    e=b64_to_int(key["e"]),
+                    n=b64_to_int(key["n"])
                 ).public_key(default_backend())
                 
                 return public_key
@@ -60,12 +70,17 @@ def get_public_key(token):
 # Middleware to validate JWT
 def validate_token(token):
     public_key = get_public_key(token)
-    return jwt.decode(token, public_key, algorithms=["RS256"], audience="account")
+    decoded_token = jwt.decode(token, public_key, algorithms=["RS256"], audience="account")
+    print("Decoded")
+    print(decoded_token)
+    return decoded_token
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
     try:
         token = request.headers.get("Authorization", "").split(" ")[1]
+        print("Token")
+        print(token)
         validate_token(token)
 
         file = request.files["file"]
