@@ -40,7 +40,7 @@ docker-compose up --build
 
 \- **MinIO Console**: http://localhost:9000
 \- Потребител: `admin`  
- \- Парола: `password123`  
+ \- Парола: `admin123`  
 \- **Keycloak**: http://localhost:8080
 \- Администраторски акаунт:  
  \- Потребител: `admin`  
@@ -53,9 +53,9 @@ docker-compose up --build
 
 ```bash
 
-curl -X POST http://localhost:5000/upload
+curl -X POST "http://localhost:5000/upload"
 -H "Authorization: Bearer <JWT_TOKEN>"
--F "file=@example.txt"
+-F "file=@test.txt"
 
 ```
 
@@ -63,8 +63,9 @@ curl -X POST http://localhost:5000/upload
 
 ```bash
 
-curl -X GET http://localhost:5000/download/<file_id>
+curl -X GET "http://localhost:5000/download/<file_id>"
 -H "Authorization: Bearer <JWT_TOKEN>"
+-o downloaded-test.txt
 
 ```
 
@@ -72,9 +73,9 @@ curl -X GET http://localhost:5000/download/<file_id>
 
 ```bash
 
-curl -X PUT http://localhost:5000/update/<file_id>
+curl -X PUT "http://localhost:5000/update/<file_id>"
 -H "Authorization: Bearer <JWT_TOKEN>"
--F "file=@new_example.txt"
+-F "file=@new_test.txt"
 
 ```
 
@@ -82,7 +83,7 @@ curl -X PUT http://localhost:5000/update/<file_id>
 
 ```bash
 
-curl -X DELETE http://localhost:5000/delete/<file_id>
+curl -X DELETE "http://localhost:5000/delete/<file_id>"
 -H "Authorization: Bearer <JWT_TOKEN>"
 
 ```
@@ -91,24 +92,22 @@ curl -X DELETE http://localhost:5000/delete/<file_id>
 
 \- **Портовете са заети**: Уверете се, че портовете 5000, 8080 и 9000 не се използват от други приложения.  
 \- **Keycloak не стартира**: Проверете логовете за грешки и уверете се, че имате поне 2 GB свободна RAM.  
-\- **Не мога да се свържа с MinIO**: Уверете се, че правилно сте въвели потребител и парола от `.env` файла.
+\- **Не мога да се свържа с MinIO**: Уверете се, че правилно сте въвели потребител и парола.
 
 ## Конфигурация на Keycloak
 
 1. Влезте в Keycloak администраторския интерфейс: http://localhost:8080.
-2. Създайте Realm: `file-management`.
-3. Добавете клиент `file-app` \(OpenID Connect\).
-4. Конфигурирайте ролите: `user`, `admin`.
+2. Създайте Realm: `VotHw`.
+3. Добавете клиент `vothw-api-client` \(OpenID Connect\).
+4. Конфигурирайте ролята: `user`.
 
 ## Структура на проекта
 
 ```
 VotHw-2/
 |
-├── config/ # Конфигурационни файлове за Docker Compose, Keycloak, MinIO.
-├── docs/ # Документация.
+├── config/ # Конфигурационен файл за Keycloak.
 ├── src/ # Основен код на приложението.
-├── .env # Променливи на средата.
 ├── docker-compose.yml
 └── README.md
 ```
