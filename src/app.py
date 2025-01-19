@@ -17,11 +17,6 @@ MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY", "admin")
 MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY", "admin123")
 MINIO_BUCKET = os.getenv("MINIO_BUCKET", "files")
 
-# Keycloak Configuration
-#if os.getenv("ENVIRONMENT") == "docker":
-    #KEYCLOAK_URL = "http://keycloak:8081"
-#else:
-#    KEYCLOAK_URL = "http://localhost:8081"
 KEYCLOAK_URL = "http://host.docker.internal:8081"
 REALM = os.getenv("REALM", "VotHw")
 JWKS_URL = f"{KEYCLOAK_URL}/realms/{REALM}/protocol/openid-connect/certs"
@@ -42,8 +37,6 @@ def get_public_key(token):
         jwks_response = requests.get(JWKS_URL)
         jwks_response.raise_for_status()
         jwks = jwks_response.json()["keys"]
-        print("JSWKS:")
-        print(jwks)
         
         # Decode the JWT to get the 'kid' (key ID)
         unverified_header = jwt.get_unverified_header(token)
@@ -71,16 +64,12 @@ def get_public_key(token):
 def validate_token(token):
     public_key = get_public_key(token)
     decoded_token = jwt.decode(token, public_key, algorithms=["RS256"], audience="account")
-    print("Decoded")
-    print(decoded_token)
     return decoded_token
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
     try:
         token = request.headers.get("Authorization", "").split(" ")[1]
-        print("Token")
-        print(token)
         validate_token(token)
 
         file = request.files["file"]
